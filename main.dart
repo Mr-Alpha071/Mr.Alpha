@@ -16,22 +16,25 @@ class ProductivityApp extends StatelessWidget {
       title: 'منظّم يومي',
       debugShowCheckedModeBanner: false,
       locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
+      supportedLocales: const <Locale>[
+        Locale('ar'),
+        Locale('en'),
+      ],
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.bg,
-        fontFamily: 'Tajawal',
+        fontFamily: 'Roboto',
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.accent,
           brightness: Brightness.dark,
         ),
       ),
-      builder: (context, child) {
-        // فرض اتجاه الكتابة من اليمين لليسار للغة العربية
+      builder: (BuildContext context, Widget? child) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: child!,
