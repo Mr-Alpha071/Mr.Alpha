@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import '../theme.dart';
 
-/// عرض الجدول اليومي الكامل (24 ساعة) بشكل قائمة قابلة للتعديل
 class DailyScheduleWidget extends StatefulWidget {
   final List<HourSlot> schedule;
   final ValueChanged<List<HourSlot>> onChanged;
 
-  const DailyScheduleWidget(
-      {super.key, required this.schedule, required this.onChanged});
+  const DailyScheduleWidget({
+    super.key,
+    required this.schedule,
+    required this.onChanged,
+  });
 
   @override
   State<DailyScheduleWidget> createState() => _DailyScheduleWidgetState();
@@ -19,16 +21,16 @@ class _DailyScheduleWidgetState extends State<DailyScheduleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
+    final DateTime now = DateTime.now();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
+      children: <Widget>[
         InkWell(
           onTap: () => setState(() => _expanded = !_expanded),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
-              children: [
+              children: <Widget>[
                 const Spacer(),
                 Text(
                   _expanded ? 'طي الجدول' : 'عرض الجدول كاملاً',
@@ -44,8 +46,8 @@ class _DailyScheduleWidgetState extends State<DailyScheduleWidget> {
           ),
         ),
         if (_expanded)
-          ...widget.schedule.map((slot) {
-            final isNow = slot.hour == now.hour;
+          ...widget.schedule.map((HourSlot slot) {
+            final bool isNow = slot.hour == now.hour;
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Container(
@@ -58,10 +60,10 @@ class _DailyScheduleWidgetState extends State<DailyScheduleWidget> {
                       ? Border.all(color: AppColors.accent, width: 1.2)
                       : null,
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 4),
                 child: Row(
-                  children: [
+                  children: <Widget>[
                     SizedBox(
                       width: 64,
                       child: Text(
@@ -70,8 +72,9 @@ class _DailyScheduleWidgetState extends State<DailyScheduleWidget> {
                           color: isNow
                               ? AppColors.accent2
                               : AppColors.textSecondary,
-                          fontWeight:
-                              isNow ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isNow
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           fontSize: 12.5,
                         ),
                       ),
@@ -91,9 +94,10 @@ class _DailyScheduleWidgetState extends State<DailyScheduleWidget> {
                           isDense: true,
                           border: InputBorder.none,
                           hintText: 'ماذا ستفعل في هذه الساعة؟',
-                          hintStyle: TextStyle(color: AppColors.textSecondary),
+                          hintStyle:
+                              TextStyle(color: AppColors.textSecondary),
                         ),
-                        onChanged: (val) {
+                        onChanged: (String val) {
                           slot.text = val;
                           widget.onChanged(widget.schedule);
                         },
