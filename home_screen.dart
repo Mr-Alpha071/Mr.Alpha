@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _storage = StorageService();
+  final StorageService _storage = StorageService();
   late String _todayKey;
   DayData? _day;
   Timer? _debounce;
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _load() async {
-    final data = await _storage.loadDay(_todayKey);
+    final DayData data = await _storage.loadDay(_todayKey);
     setState(() => _day = data);
   }
 
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await _storage.saveDay(_day!);
       if (mounted) {
         setState(() => _saved = true);
-        Future.delayed(const Duration(seconds: 1), () {
+        Future<void>.delayed(const Duration(seconds: 1), () {
           if (mounted) setState(() => _saved = false);
         });
       }
@@ -65,24 +65,22 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    final day = _day!;
-    final dateLabel =
-        DateFormat('EEEE، d MMMM yyyy', 'ar').format(DateTime.now());
+    final DayData day = _day!;
 
     return Container(
       decoration: BoxDecoration(gradient: bgGradient()),
       child: SafeArea(
         child: CustomScrollView(
-          slivers: [
+          slivers: <Widget>[
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
                 child: Row(
-                  children: [
+                  children: <Widget>[
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: <Widget>[
                           const Text(
                             'منظّم يومي',
                             style: TextStyle(
@@ -93,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            dateLabel,
+                            _todayKey,
                             style: const TextStyle(
                                 color: AppColors.textSecondary, fontSize: 13),
                           ),
@@ -101,10 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     AnimatedOpacity(
-                      opacity: _saved ? 1 : 0,
+                      opacity: _saved ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
                       child: Row(
-                        children: const [
+                        children: const <Widget>[
                           Icon(Icons.cloud_done_rounded,
                               color: AppColors.success, size: 18),
                           SizedBox(width: 4),
@@ -121,30 +119,27 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
               sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  // الجدول اليومي
+                delegate: SliverChildListDelegate(<Widget>[
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'الجدول اليومي (24 ساعة)',
                             icon: Icons.schedule_rounded),
                         const SizedBox(height: 12),
                         DailyScheduleWidget(
                           schedule: day.schedule,
-                          onChanged: (_) => _persist(),
+                          onChanged: (List<HourSlot> _) => _persist(),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // المواد الدراسية
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'المواد الدراسية',
                             icon: Icons.menu_book_rounded),
@@ -153,18 +148,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           items: day.subjects,
                           hint: 'أضف مادة دراسية...',
                           accentColor: AppColors.accent,
-                          onChanged: (_) => _persist(),
+                          onChanged: (List<SimpleItem> _) => _persist(),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // المهارات
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'المهارات', icon: Icons.bolt_rounded),
                         const SizedBox(height: 12),
@@ -172,30 +165,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           items: day.skills,
                           hint: 'أضف مهارة تريد تطويرها...',
                           accentColor: AppColors.accent2,
-                          onChanged: (_) => _persist(),
+                          onChanged: (List<SimpleItem> _) => _persist(),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // امتحان الغد
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'امتحان الغد',
                             icon: Icons.assignment_rounded),
                         const SizedBox(height: 12),
                         TextFormField(
                           initialValue: day.tomorrowExam,
-                          style: const TextStyle(color: AppColors.textPrimary),
+                          style:
+                              const TextStyle(color: AppColors.textPrimary),
                           maxLines: 2,
                           decoration: InputDecoration(
                             hintText: 'هل لديك امتحان غدًا؟ في أي مادة؟',
-                            hintStyle:
-                                const TextStyle(color: AppColors.textSecondary),
+                            hintStyle: const TextStyle(
+                                color: AppColors.textSecondary),
                             filled: true,
                             fillColor: AppColors.cardLight,
                             border: OutlineInputBorder(
@@ -203,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderSide: BorderSide.none,
                             ),
                           ),
-                          onChanged: (val) {
+                          onChanged: (String val) {
                             day.tomorrowExam = val;
                             _persist();
                           },
@@ -212,25 +204,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // اللغة الاسبانية
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'اللغة الإسبانية',
                             icon: Icons.translate_rounded),
                         const SizedBox(height: 12),
                         Row(
-                          children: [
-                            const Text('عدد الكلمات المحفوظة اليوم:',
-                                style:
-                                    TextStyle(color: AppColors.textSecondary)),
-                            const Spacer(),
+                          children: <Widget>[
+                            const Expanded(
+                              child: Text('عدد الكلمات المحفوظة اليوم:',
+                                  style: TextStyle(
+                                      color: AppColors.textSecondary)),
+                            ),
                             _StepperCounter(
                               value: day.spanishWordsCount,
-                              onChanged: (val) {
+                              onChanged: (int val) {
                                 setState(() => day.spanishWordsCount = val);
                                 _persist();
                               },
@@ -241,24 +232,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // ماذا أنجزت اليوم
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'ماذا أنجزت اليوم؟',
                             icon: Icons.emoji_events_rounded),
                         const SizedBox(height: 12),
                         TextFormField(
                           initialValue: day.accomplishedToday,
-                          style: const TextStyle(color: AppColors.textPrimary),
+                          style:
+                              const TextStyle(color: AppColors.textPrimary),
                           maxLines: 4,
                           decoration: InputDecoration(
                             hintText: 'اكتب أهم إنجازاتك اليوم...',
-                            hintStyle:
-                                const TextStyle(color: AppColors.textSecondary),
+                            hintStyle: const TextStyle(
+                                color: AppColors.textSecondary),
                             filled: true,
                             fillColor: AppColors.cardLight,
                             border: OutlineInputBorder(
@@ -266,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderSide: BorderSide.none,
                             ),
                           ),
-                          onChanged: (val) {
+                          onChanged: (String val) {
                             day.accomplishedToday = val;
                             _persist();
                           },
@@ -275,12 +265,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // أمور علي فعلها غدا
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'أمور علي فعلها غدًا',
                             icon: Icons.checklist_rounded),
@@ -289,18 +277,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           items: day.tomorrowTasks,
                           hint: 'أضف مهمة لغدًا...',
                           accentColor: AppColors.success,
-                          onChanged: (_) => _persist(),
+                          onChanged: (List<SimpleItem> _) => _persist(),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // أمور فوتها اليوم
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'أمور فوّتها اليوم (لازم تُصلح غدًا)',
                             icon: Icons.report_problem_rounded),
@@ -309,25 +295,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           items: day.missedToday,
                           hint: 'ما الذي فوتّه اليوم؟',
                           accentColor: AppColors.danger,
-                          onChanged: (_) => _persist(),
+                          onChanged: (List<SimpleItem> _) => _persist(),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // الحقول المخصصة
                   Card3D(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         const SectionHeader(
                             title: 'حقول مخصصة',
                             icon: Icons.dashboard_customize_rounded),
                         const SizedBox(height: 12),
                         CustomFieldsEditor(
                           fields: day.customFields,
-                          onChanged: (_) => _persist(),
+                          onChanged: (List<CustomField> _) => _persist(),
                         ),
                       ],
                     ),
@@ -357,9 +341,10 @@ class _StepperCounter extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           IconButton(
-            icon: const Icon(Icons.remove, color: AppColors.danger, size: 18),
+            icon:
+                const Icon(Icons.remove, color: AppColors.danger, size: 18),
             onPressed: value > 0 ? () => onChanged(value - 1) : null,
           ),
           SizedBox(
@@ -368,9 +353,10 @@ class _StepperCounter extends StatelessWidget {
               '$value',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
           IconButton(
