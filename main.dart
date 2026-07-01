@@ -26,8 +26,7 @@ class ProductivityApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.bg,
         fontFamily: 'Tajawal',
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.accent,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           brightness: Brightness.dark,
         ),
       ),
