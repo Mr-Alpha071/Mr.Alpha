@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'models.dart';
-import 'theme.dart';
+import '../models.dart';
+import '../theme.dart';
 
-/// قائمة عناصر قابلة للإضافة والحذف وتعليم الإنجاز (تُستخدم للمواد، المهارات، مهام الغد، الأمور المفوتة)
 class ItemListEditor extends StatefulWidget {
   final List<SimpleItem> items;
   final String hint;
@@ -23,11 +22,11 @@ class ItemListEditor extends StatefulWidget {
 }
 
 class _ItemListEditorState extends State<ItemListEditor> {
-  final _controller = TextEditingController();
-  final _uuid = const Uuid();
+  final TextEditingController _controller = TextEditingController();
+  final Uuid _uuid = const Uuid();
 
   void _add() {
-    final text = _controller.text.trim();
+    final String text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
       widget.items.add(SimpleItem(id: _uuid.v4(), title: text));
@@ -50,21 +49,21 @@ class _ItemListEditorState extends State<ItemListEditor> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
+      children: <Widget>[
         Row(
-          children: [
+          children: <Widget>[
             Expanded(
               child: TextField(
                 controller: _controller,
                 style: const TextStyle(color: AppColors.textPrimary),
-                onSubmitted: (_) => _add(),
+                onSubmitted: (String _) => _add(),
                 decoration: InputDecoration(
                   hintText: widget.hint,
                   hintStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.cardLight,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -81,13 +80,6 @@ class _ItemListEditorState extends State<ItemListEditor> {
                 decoration: BoxDecoration(
                   color: widget.accentColor,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.accentColor.withOpacity(0.5),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
                 ),
                 child: const Icon(Icons.add, color: Colors.white, size: 20),
               ),
@@ -95,8 +87,8 @@ class _ItemListEditorState extends State<ItemListEditor> {
           ],
         ),
         if (widget.items.isNotEmpty) const SizedBox(height: 10),
-        ...widget.items.map(
-          (item) => Padding(
+        ...widget.items.map((SimpleItem item) {
+          return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -105,11 +97,11 @@ class _ItemListEditorState extends State<ItemListEditor> {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
-                children: [
+                children: <Widget>[
                   Checkbox(
                     value: item.done,
                     activeColor: widget.accentColor,
-                    onChanged: (_) => _toggle(item),
+                    onChanged: (bool? _) => _toggle(item),
                   ),
                   Expanded(
                     child: Text(
@@ -118,8 +110,9 @@ class _ItemListEditorState extends State<ItemListEditor> {
                         color: item.done
                             ? AppColors.textSecondary
                             : AppColors.textPrimary,
-                        decoration:
-                            item.done ? TextDecoration.lineThrough : null,
+                        decoration: item.done
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
                       ),
                     ),
                   ),
@@ -131,8 +124,8 @@ class _ItemListEditorState extends State<ItemListEditor> {
                 ],
               ),
             ),
-          ),
-        ),
+          );
+        }),
       ],
     );
   }
