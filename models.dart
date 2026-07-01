@@ -1,25 +1,29 @@
 import 'dart:convert';
 
-/// نموذج عنصر الجدول اليومي (لكل ساعة)
 class HourSlot {
-  final int hour; // 0-23
+  final int hour;
   String text;
 
   HourSlot({required this.hour, this.text = ''});
 
-  Map<String, dynamic> toJson() => {'hour': hour, 'text': text};
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{'hour': hour, 'text': text};
+  }
 
-  factory HourSlot.fromJson(Map<String, dynamic> json) =>
-      HourSlot(hour: json['hour'] as int, text: json['text'] as String? ?? '');
+  factory HourSlot.fromJson(Map<String, dynamic> json) {
+    return HourSlot(
+      hour: json['hour'] as int,
+      text: json['text'] as String? ?? '',
+    );
+  }
 
   String get label {
-    final h = hour % 12 == 0 ? 12 : hour % 12;
-    final period = hour < 12 ? 'ص' : 'م';
+    final int h = hour % 12 == 0 ? 12 : hour % 12;
+    final String period = hour < 12 ? 'ص' : 'م';
     return '$h:00 $period';
   }
 }
 
-/// نموذج عنصر بسيط له نص ومؤشر إنجاز (يستخدم للمواد، المهارات)
 class SimpleItem {
   String id;
   String title;
@@ -27,19 +31,21 @@ class SimpleItem {
 
   SimpleItem({required this.id, required this.title, this.done = false});
 
-  Map<String, dynamic> toJson() => {'id': id, 'title': title, 'done': done};
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{'id': id, 'title': title, 'done': done};
+  }
 
-  factory SimpleItem.fromJson(Map<String, dynamic> json) => SimpleItem(
-        id: json['id'] as String,
-        title: json['title'] as String,
-        done: json['done'] as bool? ?? false,
-      );
+  factory SimpleItem.fromJson(Map<String, dynamic> json) {
+    return SimpleItem(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      done: json['done'] as bool? ?? false,
+    );
+  }
 }
 
-/// نوع الحقل المخصص
 enum CustomFieldType { text, boolean }
 
-/// حقل مخصص يضيفه المستخدم (نصي أو منطقي/اختياري)
 class CustomField {
   String id;
   String label;
@@ -55,37 +61,40 @@ class CustomField {
     this.boolValue = false,
   });
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'label': label,
-        'type': type.name,
-        'textValue': textValue,
-        'boolValue': boolValue,
-      };
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'label': label,
+      'type': type.name,
+      'textValue': textValue,
+      'boolValue': boolValue,
+    };
+  }
 
-  factory CustomField.fromJson(Map<String, dynamic> json) => CustomField(
-        id: json['id'] as String,
-        label: json['label'] as String,
-        type: (json['type'] == 'boolean')
-            ? CustomFieldType.boolean
-            : CustomFieldType.text,
-        textValue: json['textValue'] as String? ?? '',
-        boolValue: json['boolValue'] as bool? ?? false,
-      );
+  factory CustomField.fromJson(Map<String, dynamic> json) {
+    return CustomField(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      type: (json['type'] == 'boolean')
+          ? CustomFieldType.boolean
+          : CustomFieldType.text,
+      textValue: json['textValue'] as String? ?? '',
+      boolValue: json['boolValue'] as bool? ?? false,
+    );
+  }
 }
 
-/// نموذج اليوم الكامل لتجميع كل البيانات
 class DayData {
-  String date; // yyyy-MM-dd
+  String date;
   List<HourSlot> schedule;
-  List<SimpleItem> subjects; // المواد الدراسية
-  List<SimpleItem> skills; // المهارات
-  String tomorrowExam; // امتحان غد
-  int spanishWordsCount; // عدد الكلمات الاسبانية المحفوظة اليوم
-  String accomplishedToday; // ماذا أنجزت اليوم
-  List<SimpleItem> tomorrowTasks; // أمور علي فعلها غدا
-  List<SimpleItem> missedToday; // أمور فوتها اليوم ولازم تُصلح غدا
-  List<CustomField> customFields; // حقول مخصصة يضيفها المستخدم
+  List<SimpleItem> subjects;
+  List<SimpleItem> skills;
+  String tomorrowExam;
+  int spanishWordsCount;
+  String accomplishedToday;
+  List<SimpleItem> tomorrowTasks;
+  List<SimpleItem> missedToday;
+  List<CustomField> customFields;
 
   DayData({
     required this.date,
@@ -98,60 +107,64 @@ class DayData {
     List<SimpleItem>? tomorrowTasks,
     List<SimpleItem>? missedToday,
     List<CustomField>? customFields,
-  })  : schedule = schedule ?? List.generate(24, (i) => HourSlot(hour: i)),
-        subjects = subjects ?? [],
-        skills = skills ?? [],
-        tomorrowTasks = tomorrowTasks ?? [],
-        missedToday = missedToday ?? [],
-        customFields = customFields ?? [];
+  })  : schedule = schedule ?? List<HourSlot>.generate(24, (int i) => HourSlot(hour: i)),
+        subjects = subjects ?? <SimpleItem>[],
+        skills = skills ?? <SimpleItem>[],
+        tomorrowTasks = tomorrowTasks ?? <SimpleItem>[],
+        missedToday = missedToday ?? <SimpleItem>[],
+        customFields = customFields ?? <CustomField>[];
 
-  Map<String, dynamic> toJson() => {
-        'date': date,
-        'schedule': schedule.map((e) => e.toJson()).toList(),
-        'subjects': subjects.map((e) => e.toJson()).toList(),
-        'skills': skills.map((e) => e.toJson()).toList(),
-        'tomorrowExam': tomorrowExam,
-        'spanishWordsCount': spanishWordsCount,
-        'accomplishedToday': accomplishedToday,
-        'tomorrowTasks': tomorrowTasks.map((e) => e.toJson()).toList(),
-        'missedToday': missedToday.map((e) => e.toJson()).toList(),
-        'customFields': customFields.map((e) => e.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'date': date,
+      'schedule': schedule.map((HourSlot e) => e.toJson()).toList(),
+      'subjects': subjects.map((SimpleItem e) => e.toJson()).toList(),
+      'skills': skills.map((SimpleItem e) => e.toJson()).toList(),
+      'tomorrowExam': tomorrowExam,
+      'spanishWordsCount': spanishWordsCount,
+      'accomplishedToday': accomplishedToday,
+      'tomorrowTasks': tomorrowTasks.map((SimpleItem e) => e.toJson()).toList(),
+      'missedToday': missedToday.map((SimpleItem e) => e.toJson()).toList(),
+      'customFields': customFields.map((CustomField e) => e.toJson()).toList(),
+    };
+  }
 
-  factory DayData.fromJson(Map<String, dynamic> json) => DayData(
-        date: json['date'] as String,
-        schedule: (json['schedule'] as List<dynamic>?)
-                ?.map((e) => HourSlot.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            List.generate(24, (i) => HourSlot(hour: i)),
-        subjects: (json['subjects'] as List<dynamic>?)
-                ?.map((e) => SimpleItem.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        skills: (json['skills'] as List<dynamic>?)
-                ?.map((e) => SimpleItem.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        tomorrowExam: json['tomorrowExam'] as String? ?? '',
-        spanishWordsCount: json['spanishWordsCount'] as int? ?? 0,
-        accomplishedToday: json['accomplishedToday'] as String? ?? '',
-        tomorrowTasks: (json['tomorrowTasks'] as List<dynamic>?)
-                ?.map((e) => SimpleItem.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        missedToday: (json['missedToday'] as List<dynamic>?)
-                ?.map((e) => SimpleItem.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        customFields: (json['customFields'] as List<dynamic>?)
-                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-      );
+  factory DayData.fromJson(Map<String, dynamic> json) {
+    return DayData(
+      date: json['date'] as String,
+      schedule: (json['schedule'] as List<dynamic>?)
+              ?.map((dynamic e) => HourSlot.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          List<HourSlot>.generate(24, (int i) => HourSlot(hour: i)),
+      subjects: (json['subjects'] as List<dynamic>?)
+              ?.map((dynamic e) => SimpleItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          <SimpleItem>[],
+      skills: (json['skills'] as List<dynamic>?)
+              ?.map((dynamic e) => SimpleItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          <SimpleItem>[],
+      tomorrowExam: json['tomorrowExam'] as String? ?? '',
+      spanishWordsCount: json['spanishWordsCount'] as int? ?? 0,
+      accomplishedToday: json['accomplishedToday'] as String? ?? '',
+      tomorrowTasks: (json['tomorrowTasks'] as List<dynamic>?)
+              ?.map((dynamic e) => SimpleItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          <SimpleItem>[],
+      missedToday: (json['missedToday'] as List<dynamic>?)
+              ?.map((dynamic e) => SimpleItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          <SimpleItem>[],
+      customFields: (json['customFields'] as List<dynamic>?)
+              ?.map((dynamic e) => CustomField.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          <CustomField>[],
+    );
+  }
 
   static DayData empty(String date) => DayData(date: date);
-
   String encode() => jsonEncode(toJson());
-  static DayData decode(String date, String source) =>
-      DayData.fromJson(jsonDecode(source) as Map<String, dynamic>);
+  static DayData decode(String date, String source) {
+    return DayData.fromJson(jsonDecode(source) as Map<String, dynamic>);
+  }
 }
